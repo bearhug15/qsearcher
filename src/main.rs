@@ -14,12 +14,18 @@ impl bb{
         f(st_use,mes);
     }
 }*/
+use std::mem::{size_of, transmute};
 use qip::{OpBuilder, UnitaryBuilder, Register, CircuitError, run_local_with_init};
 use qip::program;
 
 fn main() {
     let n = 3;
-    let mut b = OpBuilder::new();
+    let mut bb = OpBuilder::new();
+    let mut b :&mut dyn UnitaryBuilder =&mut bb;
+    let mut b  = Box::from(b);
+    //let mut b:&mut [u8] = unsafe{ transmute(b)};
+    let mut b: Box<&mut OpBuilder> = unsafe{transmute(b)};
+    let mut b =*b;
     let ra = b.register(n).unwrap();
     let rb = b.register(n).unwrap();
 
@@ -56,17 +62,22 @@ fn main() {
     let mut b = bb{};
     b.apply(Box::new(st::call1),&s,"message")*/
     let r1 = b.register(3).unwrap();
-    //let r2 = b.qubit();
+    let r2 = b.qubit();
     let r1_handle = r1.handle();
+
     //let r2_handle = r2.handle();
 
-    let r1 = program!(&mut b,r1;
-    cnot_wrapper r1[0..2],r1[2];
+    let r1 = program!(b,r1;
+    cnot_wrapper r1[0],r1[1..=2];
 
     ).unwrap();
 
-    let initial_state = [r1_handle.make_init_from_index(0b110).unwrap()];
+    println!("{}",r1.n());
+    //println!("{}",r2.n());
+    //let (r1,r1m_handle) = b.measure(r1);
+    //let r1 = b.merge(vec![r1,r2]).unwrap();
     let (r1,r1m_handle) = b.measure(r1);
+    let initial_state = [r1_handle.make_init_from_index(0b010).unwrap()];
     //let (r2,r2m_handle) = b.measure(r2);
     //let r = b.merge(vec![r1, r2]).unwrap();
     let (_, measured) = run_local_with_init::<f64>(&r1, &initial_state).unwrap();
@@ -76,10 +87,12 @@ fn main() {
     //println!("Measured: {:?} (with chance {:?})", result2, p2);
 }
 fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
-    let r2 = rs.pop().unwrap();
     let r1 = rs.pop().unwrap();
+    println!("{}",r1.n());
+    let r2 = rs.pop().unwrap();
+    println!("{}",r2.n());
     let (r1,r2) = b.cnot(r1,r2);
-    Ok(vec![r1, r2])
+    Ok(vec![b.merge(vec![r1, r2]).unwrap()])
 }
 
 

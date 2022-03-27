@@ -17,14 +17,19 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="" />
+    <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/searcher/searcher.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/searcher.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,6 +51,9 @@
   <component name="MacroExpansionManager">
     <option name="directoryName" value="gpd49rbt" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="ProjectId" id="24mqQ1D4ANyNQiXBipdFcDPAE4W" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -53,9 +61,16 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
+    <property name="cidr.known.project.marker" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
@@ -66,6 +81,11 @@
     </key>
   </component>
   <component name="RunManager" selected="Cargo.Run qaccelerator">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run qaccelerator" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="run --package qaccelerator --bin qaccelerator" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -73,6 +93,7 @@
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
@@ -88,17 +109,13 @@
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
       <option name="redirectInputPath" value="" />
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
-      <method v="2">
-        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
@@ -123,6 +140,10 @@
       <workItem from="1646054410314" duration="12445000" />
       <workItem from="1647274460450" duration="49002000" />
       <workItem from="1647999917670" duration="1228000" />
+      <workItem from="1648007073857" duration="1042000" />
+      <workItem from="1648009076835" duration="3845000" />
+      <workItem from="1648088318537" duration="2902000" />
+      <workItem from="1648388801298" duration="3000" />
     </task>
     <servers />
   </component>
@@ -139,47 +160,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="409" y="524" key="#Notifications" timestamp="1648000935722">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="409" y="524" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1648000935722" />
-    <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser" timestamp="1647848756263">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1647848756263" />
-    <state x="434" y="441" key="FileChooserDialogImpl" timestamp="1648001139294">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="434" y="441" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1648001139294" />
-    <state x="532" y="598" key="Github.ShareDialog" timestamp="1648000925626">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="532" y="598" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1648000925626" />
-    <state width="1248" height="286" key="GridCell.Tab.0.bottom" timestamp="1647999936812">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="286" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1647999936812" />
-    <state width="1248" height="286" key="GridCell.Tab.0.center" timestamp="1647999936811">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="286" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1647999936811" />
-    <state width="1248" height="286" key="GridCell.Tab.0.left" timestamp="1647999936811">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="286" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1647999936811" />
-    <state width="1248" height="286" key="GridCell.Tab.0.right" timestamp="1647999936811">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="286" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1647999936811" />
-    <state x="155" y="345" key="SettingsEditor" timestamp="1648001154309">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="155" y="345" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1648001154309" />
-    <state x="317" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1648001097815">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="317" y="319" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1648001097815" />
   </component>
 </project>
