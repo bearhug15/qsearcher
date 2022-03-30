@@ -1,6 +1,7 @@
 use qip::{Register, OpBuilder, UnitaryBuilder, CircuitError};
 use std::rc::Rc;
 use qip::program;
+use qip::pipeline::RegisterInitialState;
 
 pub struct LayeredRegister {
     //prefix:Vec<Register>,
@@ -29,6 +30,30 @@ impl LayeredRegister {
             layers.push(reg);
         }
         LayeredRegister { layers, current_layer_index, start_depth,width, dif_range: None }
+    }
+    pub fn new_initialized(builder: &mut OpBuilder, width: u64, depth: usize,data:&Vec<u8>) -> (Self,Vec<RegisterInitialState<f32>>){
+        if width != (data.len()*8) as u64{
+            panic!("Not enough data to initialize")
+        }
+        let mut layers: Vec<Register> = Vec::with_capacity(depth);
+        let current_layer_index: usize = 0;
+        let start_depth: usize = depth;
+        let mut full_init = Vec::<RegisterInitialState<f32>>::new();
+        for _ in 0..depth {
+            let (comp_data,mut init )= data.iter().map(|val|{
+                let qubits =builder.register(8).unwrap();
+                let init: RegisterInitialState<f32> =qubits.handle().make_init_from_index(u64::from(val.clone())).unwrap();
+                (qubits,init)
+            }).fold((Vec::<Register>::new(),Vec::<RegisterInitialState<f32>>::new()),|(mut reg_collector,mut vec),(mut reg,init)|{
+                reg_collector.append(&mut vec![reg]);
+                vec.append(&mut vec![init]);
+                (reg_collector,vec)
+            });
+            let pre_merged =builder.merge(comp_data).unwrap();
+            layers.push(pre_merged);
+            full_init.append(&mut init);
+        }
+        (LayeredRegister { layers, current_layer_index, start_depth,width, dif_range:None},full_init)
     }
     pub fn start_depth(&self) -> usize {
         self.start_depth
@@ -82,18 +107,9 @@ impl LayeredRegister {
         }).collect();
         LayeredRegister{layers,current_layer_index, start_depth,width, dif_range }
     }
-    /*pub fn apply_to_sliced_layers1(self, mut f: Box<FnMut(&mut OpBuilder, Register) -> Register>,builder:&mut OpBuilder,start_index:u64,end_index:u64)  -> Self {
-        let  current_layer_index =self.current_layer_index;
-        let start_len = self.start_len;
 
-        let layers: Vec<Register> = self.layers.into_iter().map(|reg|{
-            program!(&mut builder,reg;
-            f reg[start_index..end_index];
-            )?;
-        }).collect();
-        LayeredRegister{layers,current_layer_index,start_len}
-    }*/
 }
+
 fn func_converter1(mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Register) -> Register>) ->Box<dyn FnMut(&mut dyn UnitaryBuilder, Vec<Register>) -> Result<Vec<Register>, CircuitError>>{
     /*fn func(builder: &mut dyn UnitaryBuilder, mut regs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
         let reg = regs.pop().unwrap();
@@ -103,4 +119,21 @@ fn func_converter1(mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Register) -> Re
         let reg = regs.pop().unwrap();
         Ok(vec![f(builder,reg)])
     })
+}
+
+pub fn register_rotr(builder: &mut OpBuilder, reg: Register, mut step: u64) -> Register{
+    let n = reg.n();
+    step = step%n;
+
+    unimplemented!()
+}
+pub fn register_and(builder: &mut OpBuilder, reg1: Register, reg2: Register, mut step: u64) -> (Register,Register,Register,RegisterInitialState<f32>){
+    let n = reg1.n();
+
+    unimplemented!()
+}
+
+fn ccnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
+
+    unimplemented!()
 }

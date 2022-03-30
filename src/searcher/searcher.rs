@@ -39,20 +39,21 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
     };
     loop {
         let mut builder = OpBuilder::new();
-        let nonce_size_bits = (start_nonce_size + epoch * step) * 8 as u64;
+        let nonce_size_bits = (start_nonce_size + epoch * step) as u64;
         let main_size_bits = (data.len() * 8) as u64 + nonce_size_bits;
-        let mut main_qubits = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage);
+        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage);
         let iterations_amount = (PI * 2_u32.pow((nonce_size_bits / 2 - 2) as u32) as f64).floor() as u64;
         let nonce_range = match main_qubits.get_dif_range() {
             None => { panic!("No diffusion range") }
             Some(val) => { val }
         };
 
-        let h_ptr: Box<dyn Fn(&mut dyn UnitaryBuilder, Register) -> Register> = Box::new(func_h);
+        let h_ptr: Box<dyn Fn(&mut dyn UnitaryBuilder, Register) -> Register> = Box::new(func_hadamard);
         main_qubits = main_qubits.apply_to_layers1_in_range(h_ptr, &mut builder, nonce_range.0, nonce_range.1);
 
         for _ in 0..iterations_amount {
-            let (buff, res) = oracle.make_prediction(main_qubits);
+            let (buff, res,mut init) = oracle.make_prediction(&mut builder,main_qubits);
+            initial_state.append(&mut init);
             main_qubits = buff;
             //todo mirroring on (-1) based on res
             let dif = Box::from(diffuse);
@@ -101,7 +102,7 @@ fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec
     Ok(vec![b.merge(vec![r1, r2]).unwrap()])
 }
 
-fn func_h(builder: &mut dyn UnitaryBuilder, reg: Register) -> Register {
+pub(crate) fn func_hadamard(builder: &mut dyn UnitaryBuilder, reg: Register) -> Register {
     let builder :Box<&mut dyn UnitaryBuilder>= Box::from(builder);
     let mut builder: Box<&mut OpBuilder> = unsafe{transmute(builder)};
     let mut builder = *builder;

@@ -15,10 +15,13 @@ impl bb{
     }
 }*/
 use std::mem::{size_of, transmute};
-use qip::{OpBuilder, UnitaryBuilder, Register, CircuitError, run_local_with_init};
+use qip::{OpBuilder, UnitaryBuilder, Register, CircuitError, run_local_with_init, Complex};
 use qip::program;
 
 fn main() {
+    /*let bv =0b00110010;
+    let v:Complex<f32> = Complex::from( bv as f32 );
+    println!("{:?}", v);*/
     let n = 3;
     let mut bb = OpBuilder::new();
     let mut b :&mut dyn UnitaryBuilder =&mut bb;
@@ -61,7 +64,7 @@ fn main() {
     /*let mut s = st{};
     let mut b = bb{};
     b.apply(Box::new(st::call1),&s,"message")*/
-    let r1 = b.register(3).unwrap();
+    let r1 = b.register(10).unwrap();
     let r2 = b.qubit();
     let r1_handle = r1.handle();
 
@@ -77,10 +80,11 @@ fn main() {
     //let (r1,r1m_handle) = b.measure(r1);
     //let r1 = b.merge(vec![r1,r2]).unwrap();
     let (r1,r1m_handle) = b.measure(r1);
+    //let initial_state = [r1_handle.make_init_from_state(vec!(Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(1.0),Complex::from(0.0))).unwrap()];
     let initial_state = [r1_handle.make_init_from_index(0b010).unwrap()];
     //let (r2,r2m_handle) = b.measure(r2);
     //let r = b.merge(vec![r1, r2]).unwrap();
-    let (_, measured) = run_local_with_init::<f64>(&r1, &initial_state).unwrap();
+    let (_, measured) = run_local_with_init::<f32>(&r1, &initial_state).unwrap();
     let (result1, p1) = measured.get_measurement(&r1m_handle).unwrap();
     //let (result2, p2) = measured.get_measurement(&r2m_handle).unwrap();
     println!("Measured: {:?} (with chance {:?})", result1, p1);
