@@ -19,9 +19,7 @@ use qip::{OpBuilder, UnitaryBuilder, Register, CircuitError, run_local_with_init
 use qip::program;
 
 fn main() {
-    /*let bv =0b00110010;
-    let v:Complex<f32> = Complex::from( bv as f32 );
-    println!("{:?}", v);*/
+
     let n = 3;
     let mut bb = OpBuilder::new();
     let mut b :&mut dyn UnitaryBuilder =&mut bb;
@@ -41,60 +39,45 @@ fn main() {
         //let q = b.hadamard(q);
         Ok(vec![ra, rb])
     }
-    //func(Box::new(gamma),&mut b,(1,3));
-    /*let a_handle = ra.handle();
-    let b_handle = rb.handle();
-    let initial_state = [a_handle.make_init_from_index(0b100).unwrap(),
-        b_handle.make_init_from_index(0b010).unwrap()];
-    let (ra, rb) = program!(&mut b, ra, rb;
-    // Applies gamma to |ra[0] ra[1]>|ra[2]>
-    gamma ra[1..3], rb[1..3];
-).unwrap();
-    let (ra, ram_handle) = b.measure(ra);
-    let (rb, rbm_handle) = b.measure(rb);
-    let r = b.merge(vec![ra, rb]).unwrap();
-    let (_, measured) = run_local_with_init::<f64>(&r, &initial_state).unwrap();
-    let (result1, p1) = measured.get_measurement(&ram_handle).unwrap();
-    let (result2, p2) = measured.get_measurement(&rbm_handle).unwrap();
-    println!("Measured: {:?} (with chance {:?})", result1, p1);
-    println!("Measured: {:?} (with chance {:?})", result2, p2);*/
-    /*let a = vec![1,1];
-    let b = vec![1,2];
-    println!("{}",a>b);*/
-    /*let mut s = st{};
-    let mut b = bb{};
-    b.apply(Box::new(st::call1),&s,"message")*/
-    let r1 = b.register(10).unwrap();
-    let r2 = b.qubit();
-    let r1_handle = r1.handle();
+    fn ccnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
+        let r3 = rs.pop().unwrap();
+        let r2 = rs.pop().unwrap();
+        let r1 = rs.pop().unwrap();
+        let(r1,r2,r3) = b.ccnot(r1,r2,r3);
+        Ok(vec![r1,r2,r3])
+    }
+
+    let mut reg1 = b.register(n).unwrap();
+    let mut reg2 = b.register(n).unwrap();
+    let mut res = b.register(n).unwrap();
+
+    for i in 0..n {
+        let (buff1, buff2, res_buff) = program!(b, reg1, reg2,res;
+            ccnot_wrapper reg1[i],reg2[i],res[i];
+        ).unwrap();
+        reg1 = buff1;
+        reg2=buff2;
+        res = res_buff;
+        println!("{}", reg1.n());
+    }
+    let init = vec![reg1.handle().make_init_from_index(0b110).unwrap(),
+                    reg2.handle().make_init_from_index(0b011).unwrap(),
+                    res.handle().make_init_from_index(0).unwrap()];
+    let (res,m_handle) = b.measure(res);
+    let (_,measured) = run_local_with_init::<f32>(&res,&init).unwrap();
+    let (result,_) = measured.get_measurement(&m_handle).unwrap();
+    println!("{}",result);
+
 
     //let r2_handle = r2.handle();
 
-    let r1 = program!(b,r1;
-    cnot_wrapper r1[0],r1[1..=2];
-
-    ).unwrap();
-
-    println!("{}",r1.n());
-    //println!("{}",r2.n());
-    //let (r1,r1m_handle) = b.measure(r1);
-    //let r1 = b.merge(vec![r1,r2]).unwrap();
-    let (r1,r1m_handle) = b.measure(r1);
-    //let initial_state = [r1_handle.make_init_from_state(vec!(Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(0.0),Complex::from(1.0),Complex::from(0.0))).unwrap()];
-    let initial_state = [r1_handle.make_init_from_index(0b010).unwrap()];
-    //let (r2,r2m_handle) = b.measure(r2);
-    //let r = b.merge(vec![r1, r2]).unwrap();
-    let (_, measured) = run_local_with_init::<f32>(&r1, &initial_state).unwrap();
-    let (result1, p1) = measured.get_measurement(&r1m_handle).unwrap();
-    //let (result2, p2) = measured.get_measurement(&r2m_handle).unwrap();
-    println!("Measured: {:?} (with chance {:?})", result1, p1);
     //println!("Measured: {:?} (with chance {:?})", result2, p2);
 }
 fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
     let r1 = rs.pop().unwrap();
-    println!("{}",r1.n());
+    //println!("{}",r1.n());
     let r2 = rs.pop().unwrap();
-    println!("{}",r2.n());
+    //println!("{}",r2.n());
     let (r1,r2) = b.cnot(r1,r2);
     Ok(vec![b.merge(vec![r1, r2]).unwrap()])
 }
@@ -120,6 +103,6 @@ fn func(mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Vec<Register>) -> Result<V
     let (_, measured) = run_local_with_init::<f64>(&r, &initial_state).unwrap();
     let (result1, p1) = measured.get_measurement(&ram_handle).unwrap();
     let (result2, p2) = measured.get_measurement(&rbm_handle).unwrap();
-    println!("Measured: {:?} (with chance {:?})", result1, p1);
-    println!("Measured: {:?} (with chance {:?})", result2, p2);
+    //println!("Measured: {:?} (with chance {:?})", result1, p1);
+    //println!("Measured: {:?} (with chance {:?})", result2, p2);
 }
