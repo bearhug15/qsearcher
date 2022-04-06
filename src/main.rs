@@ -17,6 +17,8 @@ impl bb{
 use std::mem::{size_of, transmute};
 use qip::{OpBuilder, UnitaryBuilder, Register, CircuitError, run_local_with_init, Complex};
 use qip::program;
+//use crate::searcher::utils::blank;
+use std::convert::TryInto;
 
 fn main() {
 
@@ -30,7 +32,7 @@ fn main() {
     let ra = b.register(n).unwrap();
     let rb = b.register(n).unwrap();
 
-    fn gamma(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError> {
+    /*fn gamma(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError> {
         let rb = rs.pop().unwrap();
         let ra = rs.pop().unwrap();
         let q = b.register(2).unwrap();
@@ -51,26 +53,57 @@ fn main() {
     let mut reg2 = b.register(n).unwrap();
     let mut res = b.register(n).unwrap();
 
-    for i in 0..n {
-        let (buff1, buff2, res_buff) = program!(b, reg1, reg2,res;
-            ccnot_wrapper reg1[i],reg2[i],res[i];
-        ).unwrap();
-        reg1 = buff1;
-        reg2=buff2;
-        res = res_buff;
-        println!("{}", reg1.n());
-    }
-    let init = vec![reg1.handle().make_init_from_index(0b110).unwrap(),
-                    reg2.handle().make_init_from_index(0b011).unwrap(),
+    let (reg1,reg2) = program!(b,reg1,reg2;
+    swap_wrapper reg1[0], reg2[2];
+    swap_wrapper reg1[1..=2], reg2[0..=1];
+    ).unwrap();
+    let init = vec![reg1.handle().make_init_from_index(0b101).unwrap(),
+                    reg2.handle().make_init_from_index(0b000).unwrap(),
                     res.handle().make_init_from_index(0).unwrap()];
-    let (res,m_handle) = b.measure(res);
-    let (_,measured) = run_local_with_init::<f32>(&res,&init).unwrap();
+    let (reg2,m_handle) = b.measure(reg2);
+    let (_,measured) = run_local_with_init::<f32>(&reg2,&init).unwrap();
     let (result,_) = measured.get_measurement(&m_handle).unwrap();
-    println!("{}",result);
+    println!("{}",result);*/
+    /*fn split(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError> {
+        let r1 = rs.pop().unwrap();
+        let r2 = rs.pop().unwrap();
+        Ok(vec![r1,r2])
+    }
 
-
+    let mut reg = b.register(6).unwrap();
+    let mut reg2 = b.register(2).unwrap();
+    let mut reg3 = b.register(4).unwrap();
+    let init = vec![reg.handle().make_init_from_index(0b000110).unwrap()];
+    let mut res = Vec::<Register>::with_capacity(3);
+    let mut n = reg.n();
+    for i in 0..2{
+        let (buff1,buff2 )= program!(b,reg2,reg;
+        split reg[i*2..(i+1)*2],reg[(i+1)*2..n];
+        ).unwrap();
+        n=n-2;
+        println!("buff1 {}",buff1.n());
+        println!("buff2 {}",buff2.n());
+        reg = buff2;
+        res.push(buff1);
+        reg2 = b.register(2).unwrap();
+        reg3 = b.register(2).unwrap();
+    }
+    res.push(reg);
+    //let res:[Register;3] = res.try_into().unwrap();
+    let res1 = res.pop().unwrap();
+    let res2 = res.pop().unwrap();
+    let res3 = res.pop().unwrap();
+    let (res1,res1_handle) = b.measure(res1);
+    let (res2,res2_handle) = b.measure(res2);
+    let (res3,res3_handle) = b.measure(res3);
+    let (_,measured1) = run_local_with_init::<f32>(&res1,&init).unwrap();
+    println!("{:?}",measured1);
+    let (_,measured2) = run_local_with_init::<f32>(&res2,&init).unwrap();
+    println!("{:?}",measured2);
+    let (_,measured3) = run_local_with_init::<f32>(&res3,&init).unwrap();
+    println!("{:?}",measured3);
     //let r2_handle = r2.handle();
-
+    */
     //println!("Measured: {:?} (with chance {:?})", result2, p2);
 }
 fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
@@ -105,4 +138,10 @@ fn func(mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Vec<Register>) -> Result<V
     let (result2, p2) = measured.get_measurement(&rbm_handle).unwrap();
     //println!("Measured: {:?} (with chance {:?})", result1, p1);
     //println!("Measured: {:?} (with chance {:?})", result2, p2);
+}
+fn swap_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
+    let r2 = rs.pop().unwrap();
+    let r1 = rs.pop().unwrap();
+    let (r1, r2) = b.swap(r1, r2).unwrap();
+    Ok(vec![r1, r2])
 }

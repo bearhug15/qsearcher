@@ -8,3 +8,4 @@ edition = "2018"
 [dependencies]
 qip = "0.15.3"
 sha2 = "0.10.2"
+itertools = "0.10.3"

@@ -1,5 +1,6 @@
 
 pub mod sha256_data_preparer;
-mod sha256_checker;
-mod sha256_oracle;
+pub mod sha256_checker;
+pub mod sha256_oracle;
+pub(crate) mod words_provider;
 
