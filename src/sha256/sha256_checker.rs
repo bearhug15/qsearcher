@@ -13,7 +13,7 @@ impl SHA256Checker {
 }
 
 impl Checker for SHA256Checker{
-    fn check(&self, mut result: Vec<u8>) -> bool {
+    fn check_nonce(&self, mut result: Vec<u8>) -> bool {
         let mut  data = self.data.clone();
         data.append(&mut result);
         let mut hasher = Sha256::new();
@@ -21,4 +21,5 @@ impl Checker for SHA256Checker{
         let hash: Vec<u8> = hasher.finalize().into_iter().collect();
         hash<Vec::from(self.limit)
     }
+
 }

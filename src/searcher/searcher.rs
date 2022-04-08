@@ -1,12 +1,14 @@
-use crate::searcher::data_preparer::DataPreparer;
-use crate::searcher::oracle::Oracle;
-use crate::searcher::checker::Checker;
-use crate::searcher::utils::LayeredRegister;
 use std::f64::consts::PI;
 use std::mem::transmute;
-use qip::{UnitaryBuilder, Register, OpBuilder, CircuitError};
-use std::str::from_boxed_utf8_unchecked;
+
+use qip::{CircuitError, OpBuilder, Register, UnitaryBuilder};
+use qip::pipeline::RegisterInitialState;
 use qip::program;
+
+use crate::searcher::checker::Checker;
+use crate::searcher::data_preparer::DataPreparer;
+use crate::searcher::oracle::Oracle;
+use crate::searcher::utils::LayeredRegister;
 
 const DEFAULT_MAIN_QUBIT_USAGE: usize = 1000;
 
@@ -28,7 +30,7 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
             DEFAULT_MAIN_QUBIT_USAGE
         }
     };
-    let epoch = 0;
+    let mut epoch = 0;
     let start_nonce_size = match start_nonce_size {
         None => { 1 }
         Some(val) => { val }
@@ -52,15 +54,29 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
         main_qubits = main_qubits.apply_to_layers1_in_range(h_ptr, &mut builder, nonce_range.0, nonce_range.1);
 
         for _ in 0..iterations_amount {
-            let (buff, res,mut init) = oracle.make_prediction(&mut builder,main_qubits);
+            let (buff, res, mut init) = oracle.make_prediction(&mut builder, main_qubits);
             initial_state.append(&mut init);
             main_qubits = buff;
-            //todo mirroring on (-1) based on res
+            let (buff, sign) = main_qubits.mirror_in_range(&mut builder, res, nonce_range.0, nonce_range.1);
+            main_qubits = buff;
             let dif = Box::from(diffuse);
-            main_qubits = main_qubits.apply_to_layers1_in_range(dif,&mut builder, nonce_range.0, nonce_range.1);
+            main_qubits = main_qubits.apply_to_layers1_in_range(dif, &mut builder, nonce_range.0, nonce_range.1);
         }
+
+
+        let result =  get_result(&mut builder, main_qubits,initial_state);
+
+        match checker {
+            Some(ref check) => {
+                let res = check.check_nonce(result.clone());
+                if res {
+                    return result;
+                }
+            }
+            None => return result
+        };
+        epoch = epoch + 1;
     }
-    unimplemented!()
 }
 
 fn diffuse(builder: &mut dyn UnitaryBuilder, mut qubits: Register) -> Register {
@@ -93,21 +109,28 @@ fn x_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Re
     Ok(vec![reg])
 }
 
-fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError>{
+fn cnot_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<Vec<Register>, CircuitError> {
     let r1 = rs.pop().unwrap();
-    println!("{}",r1.n());
+    println!("{}", r1.n());
     let r2 = rs.pop().unwrap();
-    println!("{}",r2.n());
-    let (r1,r2) = b.cnot(r1,r2);
+    println!("{}", r2.n());
+    let (r1, r2) = b.cnot(r1, r2);
     Ok(vec![b.merge(vec![r1, r2]).unwrap()])
 }
 
 pub(crate) fn func_hadamard(builder: &mut dyn UnitaryBuilder, reg: Register) -> Register {
-    let builder :Box<&mut dyn UnitaryBuilder>= Box::from(builder);
-    let mut builder: Box<&mut OpBuilder> = unsafe{transmute(builder)};
+    let builder: Box<&mut dyn UnitaryBuilder> = Box::from(builder);
+    let mut builder: Box<&mut OpBuilder> = unsafe { transmute(builder) };
     let mut builder = *builder;
     OpBuilder::hadamard(builder, reg)
 }
+
+#[allow(unused_doc_comments)]
+fn get_result(builder:&mut OpBuilder,main_qubits: LayeredRegister, init: Vec<RegisterInitialState<f32>>)->Vec<u8>{
+    ///This is plug for future implementation of translator to real quantum machine code
+    unimplemented!()
+}
+
 
 
 

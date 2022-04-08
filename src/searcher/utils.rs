@@ -1,7 +1,6 @@
-use qip::{Register, OpBuilder, UnitaryBuilder, CircuitError};
-use std::rc::Rc;
-use qip::program;
+use qip::{CircuitError, OpBuilder, Register, UnitaryBuilder};
 use qip::pipeline::RegisterInitialState;
+use qip::program;
 
 pub struct LayeredRegister {
     layers: Vec<Register>,
@@ -94,10 +93,10 @@ impl LayeredRegister {
         let dif_range = self.dif_range;
         let layers: Vec<Register> = Vec::with_capacity(self.layers.len());
         //let mut func = func_converter1(f);
-        let func = (move |builder: &mut dyn UnitaryBuilder, mut regs: Vec<Register>| -> Result<Vec<Register>, CircuitError>{
+        let func = move |builder: &mut dyn UnitaryBuilder, mut regs: Vec<Register>| -> Result<Vec<Register>, CircuitError>{
             let reg = regs.pop().unwrap();
             Ok(vec![f(builder, reg)])
-        });
+        };
         let layers: Vec<Register> = self.layers.into_iter().map(|reg| {
             program!(builder,reg;
             func reg[start..end];
@@ -105,6 +104,23 @@ impl LayeredRegister {
         }).collect();
         LayeredRegister { layers, current_layer_index, start_depth, width, dif_range }
     }
+
+    pub(crate) fn mirror_in_range(mut self, builder: &mut OpBuilder, sign: Register, start: u64, end: u64) -> (Self, Register) {
+        let current_layer_index = self.current_layer_index;
+        let start_depth = self.start_depth;
+        let width = self.width;
+        let dif_range = self.dif_range;
+        let len = self.layers.len();
+        let (sign, layers) = self.layers.into_iter().fold((sign, Vec::<Register>::with_capacity(len)), |(sign, mut layers), reg| {
+            let (sign_buff, reg_buff) = program!(builder,sign,reg;
+            cnot_wrapper sign, reg[start..end];
+            ).unwrap();
+            layers.push(reg_buff);
+            (sign_buff, layers)
+        });
+        (LayeredRegister { layers, current_layer_index, start_depth, width, dif_range }, sign)
+    }
+
 }
 
 fn func_converter1(mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Register) -> Register>) -> Box<dyn FnMut(&mut dyn UnitaryBuilder, Vec<Register>) -> Result<Vec<Register>, CircuitError>> {
@@ -307,25 +323,25 @@ pub fn zeroed_register(b: &mut dyn UnitaryBuilder, len: u64) -> (Register, Vec<R
     let mut chunks = Vec::<Register>::with_capacity(buff as usize);
     let mut inits = Vec::<RegisterInitialState<f32>>::with_capacity(buff as usize);
     for _ in 0..chunks_amount {
-        let reg = builder.register(8).unwrap();
+        let reg = b.register(8).unwrap();
         let init = reg.handle().make_init_from_index(0).unwrap();
         chunks.push(reg);
         inits.push(init)
     }
     if remains_len != 0 {
-        let reg = builder.register(remains_len).unwrap();
+        let reg = b.register(remains_len).unwrap();
         let init = reg.handle().make_init_from_index(0).unwrap();
         chunks.push(reg);
         inits.push(init)
     }
-    let reg = builder.merge(chunks).unwrap();
+    let reg = b.merge(chunks).unwrap();
     (reg, inits)
 }
 
 pub fn oneed_register(b: &mut dyn UnitaryBuilder, len: u64) -> (Register, Vec<RegisterInitialState<f32>>) {
-    let (mut reg,init) = zeroed_register(b,n);
+    let (mut reg, init) = zeroed_register(b, len);
     reg = b.not(reg);
-    (reg,init)
+    (reg, init)
 }
 
 pub fn register_sum(builder: &mut OpBuilder, mut reg1: Register, mut reg2: Register) -> (Register, Register, Register, Vec<RegisterInitialState<f32>>) {
@@ -433,9 +449,9 @@ pub fn register_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Reg
     (reg1, reg2, fres, init)
 }
 
-pub fn register_more_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Register) -> (Register, Register, Register, Vec<RegisterInitialState<f32>>) {
+pub fn register_more_eq(builder: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Register) -> (Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     let n = reg1.n();
-    let (mut res, mut init) = zeroed_register(b, n);
+    let (mut res, mut init) = zeroed_register(builder, n);
     for i in 0..n {
         let (buff1, buff2, res_buff) = program!(builder, reg1, reg2,res;
             ccnot_wrapper reg1[i],reg2[i],res[i];
@@ -444,7 +460,7 @@ pub fn register_more_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2
         reg2 = buff2;
         res = res_buff;
     }
-    reg1 = b.not(reg1);
+    reg1 = builder.not(reg1);
     for i in 0..n {
         let (buff1, buff2, res_buff) = program!(builder, reg1, reg2,res;
             ccnot_wrapper reg1[i],reg2[i],res[i];
@@ -453,7 +469,7 @@ pub fn register_more_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2
         reg2 = buff2;
         res = res_buff;
     }
-    reg2 = b.not(reg2);
+    reg2 = builder.not(reg2);
     for i in 0..n {
         let (buff1, buff2, res_buff) = program!(builder, reg1, reg2,res;
             ccnot_wrapper reg1[i],reg2[i],res[i];
@@ -462,11 +478,11 @@ pub fn register_more_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2
         reg2 = buff2;
         res = res_buff;
     }
-    reg1 = b.not(reg1);
-    reg2 = b.not(reg2);
-    let (mut fres, mut init1) = zeroed_register(b, 1);
+    reg1 = builder.not(reg1);
+    reg2 = builder.not(reg2);
+    let (mut fres, mut init1) = zeroed_register(builder, 1);
     init.append(&mut init1);
-    let (res, fres) = b.cnot(res, fres);
+    let (res, fres) = builder.cnot(res, fres);
     (reg1, reg2, fres, init)
 }
 

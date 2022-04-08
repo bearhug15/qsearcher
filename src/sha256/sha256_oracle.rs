@@ -1,20 +1,20 @@
-use crate::searcher::oracle::Oracle;
-use qip::{OpBuilder, Register, Complex, UnitaryBuilder, CircuitError};
-use crate::searcher::utils::{LayeredRegister, register_rotl, register_xor, register_entangled_copy, register_and, register_sum, register_not, register_eq};
-use qip::pipeline::{RegisterInitialState, InitialState};
-use std::convert::{TryFrom, TryInto};
-use crate::searcher::searcher::func_hadamard;
-use itertools::izip;
-use std::collections::HashMap;
-use crate::sha256::words_provider::WordsProvider;
+#![allow(non_snake_case)]
 
+use std::collections::HashMap;
+use std::convert::TryInto;
+
+use qip::{OpBuilder, Register, UnitaryBuilder};
+use qip::pipeline::RegisterInitialState;
+
+use crate::searcher::oracle::Oracle;
+use crate::searcher::searcher::func_hadamard;
+use crate::searcher::utils::{LayeredRegister, register_and, register_entangled_copy, register_eq, register_not, register_rotl, register_sum, register_xor};
+use crate::sha256::words_provider::WordsProvider;
 
 pub struct SHA256Oracle {
     //builder: OpBuilder,
     service_data: Vec<u8>,
     limit: [u8; 32],
-    limit_reg: Option<(Register,Vec<RegisterInitialState<f32>>)>,
-
 }
 
 impl Oracle for SHA256Oracle {
@@ -33,7 +33,7 @@ impl Oracle for SHA256Oracle {
                 ];
                 //let u8_vars = <&[u8;32]>::try_from(&vars).unwrap();
 
-                let vars = vars.into_iter().map(|val| {
+                let vars = vars.iter().map(|val| {
                     val.to_be_bytes()
                 }).fold(Vec::<u8>::with_capacity(32), |mut vec, val| {
                     vec.append(&mut val.to_vec());
@@ -51,7 +51,6 @@ impl Oracle for SHA256Oracle {
 
     fn make_prediction(&mut self, builder: &mut OpBuilder, mut main_data: LayeredRegister) -> (LayeredRegister, Register, Vec<RegisterInitialState<f32>>) {
         if main_data.width() % 512 != 0 { panic!("Length should be a multiple of 512") }
-        let working_reg = main_data.pop_layer();
         let mut init = Vec::<RegisterInitialState<f32>>::new();
         let (mut vars, mut init1) = self.init_service(builder);
         let (mut consts, mut init2) = init_consts(builder);
@@ -60,17 +59,19 @@ impl Oracle for SHA256Oracle {
         let steps = main_data.width() / 512;
         let mut words_provider = WordsProvider::init();
         for step in 0..steps {
-            let (vars_buff, vars_copy, init_buff) = get_vars_copy(builder, vars);
+            let (vars_buff, mut vars_copy, mut init_buff) = get_vars_copy(builder, vars);
             vars = vars_buff;
+            init.append(&mut init_buff);
             for i in 0..63 {
-                let a: Register = vars_copy[0];
-                let b: Register = vars_copy[1];
-                let c: Register = vars_copy[2];
-                let d: Register = vars_copy[3];
-                let e: Register = vars_copy[4];
-                let f: Register = vars_copy[5];
-                let g: Register = vars_copy[6];
-                let h: Register = vars_copy[7];
+                let mut vars_copyv = Vec::<Register>::from(vars_copy);
+                let a: Register = vars_copyv.pop().unwrap();
+                let b: Register = vars_copyv.pop().unwrap();
+                let c: Register = vars_copyv.pop().unwrap();
+                let mut d: Register = vars_copyv.pop().unwrap();
+                let e: Register = vars_copyv.pop().unwrap();
+                let f: Register = vars_copyv.pop().unwrap();
+                let g: Register = vars_copyv.pop().unwrap();
+                let mut h: Register = vars_copyv.pop().unwrap();
 
 
                 let (a, Sum0, mut init_buff) = get_Sum0(builder, a);
@@ -85,48 +86,46 @@ impl Oracle for SHA256Oracle {
                 init.append(&mut init_buff);
                 let (wi, mut init_buff) = words_provider.get_word(builder, &mut main_data, step, i);
                 init.append(&mut init_buff);
-                let (mut h, _, _, ki, wi, t1, mut init_buff) = get_t1(builder, h, Sum1, Ch, consts[i as usize], wi);
+                let const_buff = consts.remove(&(i as usize)).unwrap();
+                let (_, _, _, const_buff, wi, t1, mut init_buff) = get_t1(builder, h, Sum1, Ch, const_buff, wi);
+                consts.insert(i as usize, const_buff);
                 init.append(&mut init_buff);
                 words_provider.return_word(wi, step, i);
 
                 h = g;
                 g = f;
                 f = e;
-                let (mut d, t1, res, mut init_buff) = register_sum(builder, d, t1);
+                let (_, t1, res, mut init_buff) = register_sum(builder, d, t1);
                 init.append(&mut init_buff);
                 e = res;
                 d = c;
                 c = b;
                 b = a;
-                let (mut t1, t2, res, mut init_buff) = register_sum(builder, t1, t2);
+                let (_, _, res, mut init_buff) = register_sum(builder, t1, t2);
                 init.append(&mut init_buff);
                 a = res;
 
-                vars_copy[0] = a;
-                vars_copy[1] = b;
-                vars_copy[2] = c;
-                vars_copy[3] = d;
-                vars_copy[4] = e;
-                vars_copy[5] = f;
-                vars_copy[6] = g;
-                vars_copy[7] = h;
+                vars_copyv.push(a);
+                vars_copyv.push(b);
+                vars_copyv.push(c);
+                vars_copyv.push(d);
+                vars_copyv.push(e);
+                vars_copyv.push(f);
+                vars_copyv.push(g);
+                vars_copyv.push(h);
+                vars_copy = vars_copyv.try_into().unwrap();
             }
-            let (vars_buff, init_buff) = get_next_vars(builder, vars, vars_copy);
+            let (vars_buff, mut init_buff) = get_next_vars(builder, vars, vars_copy);
             vars = vars_buff;
+            init.append(&mut init_buff);
         }
-        let res = builder.merge(vars.to_vec()).unwrap();
-        match self.limit_reg {
-            None => {
-                let (limit,init_buff) = self.init_limit(builder);
-                init.append(&mut init_buff.clone());
-                self.limit_reg = Some((limit,init_buff));
-            }
-            Some(_) => {}
-        }
-        let (limit,init_buff) = self.limit_reg;
-        let (res,limit,sign, mut init_buff2) = register_eq(builder,res,limit);
+        let res = builder.merge(Vec::from(vars)).unwrap();
+        let (limit, init_buff) = self.init_limit(builder);
+        init.append(&mut init_buff.clone());
+
+        let (_, _, sign, mut init_buff2) = register_eq(builder, res, limit);
         init.append(&mut init_buff2);
-        (main_data,sign,init)
+        (main_data, sign, init)
     }
 
 
@@ -154,8 +153,8 @@ impl Oracle for SHA256Oracle {
 }
 
 impl SHA256Oracle {
-    fn init(limit:[u8; 32])->Self{
-        unimplemented!()
+    fn init(limit: [u8; 32]) -> Self {
+        SHA256Oracle{ service_data: vec![], limit }
     }
     fn init_service(&self, builder: &mut OpBuilder) -> ([Register; 8], Vec<RegisterInitialState<f32>>) {
         if self.service_data.len() != 8 {
@@ -172,10 +171,10 @@ impl SHA256Oracle {
         let regs: [Register; 8] = regs.try_into().unwrap();
         (regs, init)
     }
-    fn init_limit(&self, builder: &mut OpBuilder) ->( Register, Vec<RegisterInitialState<f32>>){
+    fn init_limit(&self, builder: &mut OpBuilder) -> (Register, Vec<RegisterInitialState<f32>>) {
         let mut regs = Vec::<Register>::with_capacity(32);
         let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(32);
-        self.limit.iter().for_each(|val|{
+        self.limit.iter().for_each(|val| {
             let reg = builder.register(8).unwrap();
             let initialized: RegisterInitialState<f32> = reg.handle().make_init_from_index(u64::from(val.clone())).unwrap();
             init.push(initialized);
@@ -186,7 +185,7 @@ impl SHA256Oracle {
     }
 }
 
-fn init_consts(builder: &mut OpBuilder) -> ([Register; 64], Vec<RegisterInitialState<f32>>) {
+fn init_consts(builder: &mut OpBuilder) -> (HashMap<usize, Register>, Vec<RegisterInitialState<f32>>) {
     let consts: [u32; 64] = [
         0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
         0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3, 0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174,
@@ -199,47 +198,43 @@ fn init_consts(builder: &mut OpBuilder) -> ([Register; 64], Vec<RegisterInitialS
     ];
     let mut regs = Vec::<Register>::with_capacity(64);
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(64);
-    consts.iter().enumerate().for_each(|(i, val)| {
+    consts.iter().for_each(|val| {
         let reg = builder.register(32).unwrap();
-        let initialized: RegisterInitialState<f32> = reg.handle().make_init_from_index(u64::from(consts[i])).unwrap();
+        let initialized: RegisterInitialState<f32> = reg.handle().make_init_from_index(u64::from(val.clone())).unwrap();
         init.push(initialized);
         regs.push(reg)
     });
-    let regs: [Register; 64] = regs.try_into().unwrap();
-    (regs, init)
+    let map = HashMap::<usize, Register>::with_capacity(64);
+
+    regs.into_iter().enumerate().fold(HashMap::<usize, Register>::with_capacity(64), |mut map, (i, val)| {
+        map.insert(i, val);
+        map
+    });
+    (map, init)
 }
 
-fn get_vars_copy(builder: &mut OpBuilder, mut vars: [Register; 8]) -> ([Register; 8], [Register; 8], Vec<RegisterInitialState<f32>>) {
+fn get_vars_copy(builder: &mut OpBuilder, mut init_vars: [Register; 8]) -> ([Register; 8], [Register; 8], Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(8);
-    let (buff, a, mut init_buff) = register_entangled_copy(builder, vars[0]);
-    init.append(&mut init_buff);
-    vars[0] = buff;
-    let (buff, b, mut init_buff) = register_entangled_copy(builder, vars[1]);
-    init.append(&mut init_buff);
-    vars[1] = buff;
-    let (buff, c, mut init_buff) = register_entangled_copy(builder, vars[2]);
-    init.append(&mut init_buff);
-    vars[2] = buff;
-    let (buff, d, mut init_buff) = register_entangled_copy(builder, vars[3]);
-    init.append(&mut init_buff);
-    vars[3] = buff;
-    let (buff, e, mut init_buff) = register_entangled_copy(builder, vars[4]);
-    init.append(&mut init_buff);
-    vars[4] = buff;
-    let (buff, f, mut init_buff) = register_entangled_copy(builder, vars[5]);
-    init.append(&mut init_buff);
-    vars[5] = buff;
-    let (buff, g, mut init_buff) = register_entangled_copy(builder, vars[6]);
-    init.append(&mut init_buff);
-    vars[6] = buff;
-    let (buff, h, mut init_buff) = register_entangled_copy(builder, vars[7]);
-    init.append(&mut init_buff);
-    vars[7] = buff;
-    let vars_copy = [a, b, c, d, e, f, g, h];
+    let mut vars = Vec::<Register>::with_capacity(8);
+    let mut vars_copy = Vec::<Register>::with_capacity(8);
+    for val in IntoIterator::into_iter(init_vars) {
+        let (val1, val2, mut init_buff) = register_entangled_copy(builder, val);
+        init.append(&mut init_buff);
+        vars.push(val1);
+        vars_copy.push(val2);
+    };
+    /*init_vars.into_iter().for_each(
+        |val:Register|{
+            let (val1, val2, mut init_buff) = register_entangled_copy(builder, val);
+            init.append(&mut init_buff);
+            vars.push(val1);
+            vars_copy.push(val2);
+        });*/
+    let vars: [Register; 8] = vars.try_into().unwrap();
+    let vars_copy: [Register; 8] = vars_copy.try_into().unwrap();
     (vars, vars_copy, init)
 }
 
-#[allow(non_snake_case)]
 fn get_Sum0(builder: &mut OpBuilder, a: Register) -> (Register, Register, Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(5);
     let (a, buff1, mut init_buff) = register_rotl(builder, a, 2);
@@ -248,14 +243,13 @@ fn get_Sum0(builder: &mut OpBuilder, a: Register) -> (Register, Register, Vec<Re
     init.append(&mut init_buff);
     let (a, buff3, mut init_buff) = register_rotl(builder, a, 22);
     init.append(&mut init_buff);
-    let (buff1, buff2, xored1, mut init_buff) = register_xor(builder, buff1, buff2);
+    let (_, _, xored1, mut init_buff) = register_xor(builder, buff1, buff2);
     init.append(&mut init_buff);
-    let (xored1, buff3, xored2, mut init_buff) = register_xor(builder, xored1, buff3);
+    let (_, _, xored2, mut init_buff) = register_xor(builder, xored1, buff3);
     init.append(&mut init_buff);
     (a, xored2, init)
 }
 
-#[allow(non_snake_case)]
 fn get_Ma(builder: &mut OpBuilder, a: Register, b: Register, c: Register) -> (Register, Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(5);
     let (mut a, mut b, mut ab, mut init_buff) = register_and(builder, a, b);
@@ -264,19 +258,17 @@ fn get_Ma(builder: &mut OpBuilder, a: Register, b: Register, c: Register) -> (Re
     init.append(&mut init_buff);
     let (mut b, mut c, mut bc, mut init_buff) = register_and(builder, b, c);
     init.append(&mut init_buff);
-    let (ab, ac, xored1, mut init_buff) = register_xor(builder, ab, ac);
+    let (_, _, xored1, mut init_buff) = register_xor(builder, ab, ac);
     init.append(&mut init_buff);
-    let (xored1, bc, xored2, mut init_buff) = register_xor(builder, xored1, bc);
+    let (_, _, xored2, mut init_buff) = register_xor(builder, xored1, bc);
     init.append(&mut init_buff);
     (a, b, c, xored2, init)
 }
 
-#[allow(non_snake_case)]
 fn get_t2(builder: &mut OpBuilder, Sum0: Register, Ma: Register) -> (Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     register_sum(builder, Sum0, Ma)
 }
 
-#[allow(non_snake_case)]
 fn get_Sum1(builder: &mut OpBuilder, e: Register) -> (Register, Register, Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(5);
     let (e, buff1, mut init_buff) = register_rotl(builder, e, 6);
@@ -285,67 +277,50 @@ fn get_Sum1(builder: &mut OpBuilder, e: Register) -> (Register, Register, Vec<Re
     init.append(&mut init_buff);
     let (e, buff3, mut init_buff) = register_rotl(builder, e, 25);
     init.append(&mut init_buff);
-    let (buff1, buff2, xored1, mut init_buff) = register_xor(builder, buff1, buff2);
+    let (_, _, xored1, mut init_buff) = register_xor(builder, buff1, buff2);
     init.append(&mut init_buff);
-    let (xored1, buff3, xored2, mut init_buff) = register_xor(builder, xored1, buff3);
+    let (_, _, xored2, mut init_buff) = register_xor(builder, xored1, buff3);
     init.append(&mut init_buff);
     (e, xored2, init)
 }
 
-#[allow(non_snake_case)]
 fn get_Ch(builder: &mut OpBuilder, e: Register, f: Register, g: Register) -> (Register, Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(4);
     let (e, f, ef, mut init_buff) = register_and(builder, e, f);
     init.append(&mut init_buff);
     let (e, not, mut init_buff) = register_not(builder, e);
     init.append(&mut init_buff);
-    let (not, g, notg, mut init_buff) = register_and(builder, not, g);
+    let (_, g, notg, mut init_buff) = register_and(builder, not, g);
     init.append(&mut init_buff);
-    let (ef, notg, xored, mut init_buff) = register_xor(builder, ef, notg);
+    let (_, _, xored, mut init_buff) = register_xor(builder, ef, notg);
     init.append(&mut init_buff);
     (e, f, g, xored, init)
 }
 
-#[allow(non_snake_case)]
 fn get_t1(builder: &mut OpBuilder, h: Register, Sum1: Register, Ch: Register, k: Register, w: Register) -> (Register, Register, Register, Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::with_capacity(4);
     let (h, Sum1, s1, mut init_buff) = register_sum(builder, h, Sum1);
     init.append(&mut init_buff);
-    let (s1, Ch, s2, mut init_buff) = register_sum(builder, s1, Ch);
+    let (_, Ch, s2, mut init_buff) = register_sum(builder, s1, Ch);
     init.append(&mut init_buff);
-    let (s2, k, s3, mut init_buff) = register_sum(builder, s2, k);
+    let (_, k, s3, mut init_buff) = register_sum(builder, s2, k);
     init.append(&mut init_buff);
-    let (s3, w, s4, mut init_buff) = register_sum(builder, s3, w);
+    let (_, w, s4, mut init_buff) = register_sum(builder, s3, w);
     init.append(&mut init_buff);
     (h, Sum1, Ch, k, w, s4, init)
 }
 
 fn get_next_vars(builder: &mut OpBuilder, mut vars: [Register; 8], mut increment: [Register; 8]) -> ([Register; 8], Vec<RegisterInitialState<f32>>) {
     let mut init = Vec::<RegisterInitialState<f32>>::new();
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[0], increment[0]);
-    init.append(&mut init_buff);
-    vars[0] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[1], increment[1]);
-    init.append(&mut init_buff);
-    vars[1] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[2], increment[2]);
-    init.append(&mut init_buff);
-    vars[2] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[3], increment[3]);
-    init.append(&mut init_buff);
-    vars[3] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[4], increment[4]);
-    init.append(&mut init_buff);
-    vars[4] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[5], increment[5]);
-    init.append(&mut init_buff);
-    vars[5] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[6], increment[6]);
-    init.append(&mut init_buff);
-    vars[6] = res;
-    let (val1, val2, res, mut init_buff) = register_sum(builder, vars[7], increment[7]);
-    init.append(&mut init_buff);
-    vars[7] = res;
-    (vars, init)
+    let mut result = Vec::<Register>::with_capacity(8);
+    for (var, inc) in IntoIterator::into_iter(vars).zip(IntoIterator::into_iter(increment)) {
+        let (_, _, res, mut init_buff) = register_sum(builder, var, inc);
+        init.append(&mut init_buff);
+        result.push(res);
+    };
+
+    let result: [Register; 8] = result.try_into().unwrap();
+
+    (result, init)
 }
 

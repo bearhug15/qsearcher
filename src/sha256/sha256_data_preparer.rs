@@ -1,6 +1,7 @@
-use crate::searcher::data_preparer::{DataPreparer, DataPrepareResult};
-use std::mem;
 use std::convert::TryFrom;
+use std::mem;
+
+use crate::searcher::data_preparer::{DataPreparer, DataPrepareResult};
 
 pub struct SHA256DataPreparer {}
 
