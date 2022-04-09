@@ -154,7 +154,7 @@ impl Oracle for SHA256Oracle {
 
 impl SHA256Oracle {
     fn init(limit: [u8; 32]) -> Self {
-        SHA256Oracle{ service_data: vec![], limit }
+        SHA256Oracle { service_data: vec![], limit }
     }
     fn init_service(&self, builder: &mut OpBuilder) -> ([Register; 8], Vec<RegisterInitialState<f32>>) {
         if self.service_data.len() != 8 {

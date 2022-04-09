@@ -395,7 +395,6 @@ pub fn sum_wrapper(b: &mut dyn UnitaryBuilder, mut rs: Vec<Register>) -> Result<
     Ok(vec![reg1, reg2, res, p, c1, c2, c3])
 }
 
-
 pub fn qubit_xor(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Register, mut zeroed_res: Register) -> (Register, Register, Register) {
     reg1 = b.not(reg1);
     let (mut reg1, mut reg2, mut zeroed_res) = b.ccnot(reg1, reg2, zeroed_res);

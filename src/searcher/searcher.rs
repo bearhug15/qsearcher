@@ -10,7 +10,7 @@ use crate::searcher::data_preparer::DataPreparer;
 use crate::searcher::oracle::Oracle;
 use crate::searcher::utils::LayeredRegister;
 
-const DEFAULT_MAIN_QUBIT_USAGE: usize = 1000;
+const DEFAULT_MAIN_QUBIT_USAGE: usize = 10;
 
 pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, mut oracle: Box<dyn Oracle>, checker: Option<Box<dyn Checker>>, start_nonce_size: Option<u64>, step: Option<u64>) -> Vec<u8> {
     match data_preparer {
@@ -26,7 +26,6 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
     let main_qubit_usage = match oracle.get_main_qubit_usage() {
         Some(val) => val,
         None => {
-            //todo add a compile time warning
             DEFAULT_MAIN_QUBIT_USAGE
         }
     };
@@ -43,8 +42,9 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
         let mut builder = OpBuilder::new();
         let nonce_size_bits = (start_nonce_size + epoch * step) as u64;
         let main_size_bits = (data.len() * 8) as u64 + nonce_size_bits;
-        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage);
-        let iterations_amount = (PI * 2_u32.pow((nonce_size_bits / 2 - 2) as u32) as f64).floor() as u64;
+        let iterations_amount = (PI * (nonce_size_bits as f64).sqrt() as f64 /4.0).floor() as u64;
+        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage * iterations_amount as usize);
+
         let nonce_range = match main_qubits.get_dif_range() {
             None => { panic!("No diffusion range") }
             Some(val) => { val }
@@ -62,7 +62,6 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
             let dif = Box::from(diffuse);
             main_qubits = main_qubits.apply_to_layers1_in_range(dif, &mut builder, nonce_range.0, nonce_range.1);
         }
-
 
         let result =  get_result(&mut builder, main_qubits,initial_state);
 
