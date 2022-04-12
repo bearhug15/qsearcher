@@ -46,7 +46,7 @@ impl Oracle for SHA256Oracle {
     }
 
     fn get_main_qubit_usage(&self) -> Option<usize> {
-        None
+        Some(1)
     }
 
     fn make_prediction(&mut self, builder: &mut OpBuilder, mut main_data: LayeredRegister) -> (LayeredRegister, Register, Vec<RegisterInitialState<f32>>) {

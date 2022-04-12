@@ -12,7 +12,12 @@ use crate::searcher::utils::LayeredRegister;
 
 const DEFAULT_MAIN_QUBIT_USAGE: usize = 10;
 
-pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, mut oracle: Box<dyn Oracle>, checker: Option<Box<dyn Checker>>, start_nonce_size: Option<u64>, step: Option<u64>) -> Vec<u8> {
+pub fn search(mut data: Vec<u8>,
+              data_preparer: Option<Box<dyn DataPreparer>>,
+              mut oracle: Box<dyn Oracle>,
+              checker: Option<Box<dyn Checker>>,
+              start_nonce_size: Option<u64>,
+              step: Option<u64>) -> Vec<u8> {
     match data_preparer {
         Some(prep) => {
             let prepared = prep.prepare(&data);
@@ -43,7 +48,7 @@ pub fn search(mut data: Vec<u8>, data_preparer: Option<Box<dyn DataPreparer>>, m
         let nonce_size_bits = (start_nonce_size + epoch * step) as u64;
         let main_size_bits = (data.len() * 8) as u64 + nonce_size_bits;
         let iterations_amount = (PI * (nonce_size_bits as f64).sqrt() as f64 /4.0).floor() as u64;
-        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage * iterations_amount as usize);
+        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage * iterations_amount as usize +1);
 
         let nonce_range = match main_qubits.get_dif_range() {
             None => { panic!("No diffusion range") }
