@@ -433,7 +433,7 @@ pub fn qubit_or(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Regist
 pub fn register_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Register) -> (Register, Register, Register, Vec<RegisterInitialState<f32>>) {
     let n = reg1.n();
     let (mut res, mut init) = zeroed_register(b, n);
-    reg1 = b.not(reg1);
+    //reg1 = b.not(reg1);
     for i in 0..n {
         let (buff1, buff2, res_buff) = program!(b, reg1, reg2,res;
             ccnot_wrapper reg1[i],reg2[i],res[i];
@@ -452,6 +452,7 @@ pub fn register_eq(b: &mut dyn UnitaryBuilder, mut reg1: Register, mut reg2: Reg
         reg2 = buff2;
         res = res_buff;
     }
+    reg1 = b.not(reg1);
     reg2 = b.not(reg2);
     res = b.not(res);
     let (mut fres, mut init1) = zeroed_register(b, 1);
