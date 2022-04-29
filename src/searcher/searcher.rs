@@ -55,17 +55,25 @@ pub fn search(mut data: Vec<u8>,
             Some(val) => { val }
         };
 
-        let h_ptr: Box<dyn Fn(&mut dyn UnitaryBuilder, Register) -> Register> = Box::new(func_hadamard);
-        main_qubits = main_qubits.apply_to_layers1_in_range(h_ptr, &mut builder, nonce_range.0, nonce_range.1);
+
+        for range in nonce_range.iter(){
+            let h_ptr: Box<dyn Fn(&mut dyn UnitaryBuilder, Register) -> Register> = Box::new(func_hadamard);
+            let main_qubits_buff = main_qubits.apply_to_layers1_in_range(h_ptr, &mut builder, range.0, range.1);
+            main_qubits = main_qubits_buff;
+        }
 
         for _ in 0..iterations_amount {
-            let (buff, res, mut init) = oracle.make_prediction(&mut builder, main_qubits);
+            let (buff, mut sign, mut init) = oracle.make_prediction(&mut builder, main_qubits);
             initial_state.append(&mut init);
             main_qubits = buff;
-            let (buff, sign) = main_qubits.mirror_in_range(&mut builder, res, nonce_range.0, nonce_range.1);
-            main_qubits = buff;
-            let dif = Box::from(diffuse);
-            main_qubits = main_qubits.apply_to_layers1_in_range(dif, &mut builder, nonce_range.0, nonce_range.1);
+            for range in nonce_range.iter() {
+                let (buff, sign_buff) = main_qubits.mirror_in_range(&mut builder, sign, range.0, range.1);
+                sign = sign_buff;
+                main_qubits = buff;
+                let dif = Box::from(diffuse);
+                main_qubits = main_qubits.apply_to_layers1_in_range(dif, &mut builder, range.0, range.1);
+            }
+
         }
 
         let result =  get_result(&mut builder, main_qubits,initial_state);

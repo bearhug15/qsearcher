@@ -147,7 +147,7 @@ impl Oracle for SHA256Oracle {
         let (mut qubits, init) = LayeredRegister::new_initialized(builder, full_size_bits, main_qubit_usage, &data);
         let h_ptr = Box::new(func_hadamard);
         qubits = qubits.apply_to_layers1_in_range(h_ptr, builder, main_size_bits, nonce_size * 8);
-        qubits.set_dif_range((old_data.len() * 8) as u64, main_size_bits);
+        qubits.add_dif_range((old_data.len() * 8) as u64, main_size_bits);
         (qubits, init)
     }
 }

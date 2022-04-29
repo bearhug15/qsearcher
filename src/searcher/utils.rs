@@ -1,13 +1,16 @@
 use qip::{CircuitError, OpBuilder, Register, UnitaryBuilder};
 use qip::pipeline::RegisterInitialState;
 use qip::program;
+use std::collections::HashSet;
+use std::collections::hash_map::RandomState;
+
 
 pub struct LayeredRegister {
     layers: Vec<Register>,
     current_layer_index: usize,
     start_depth: usize,
     width: u64,
-    dif_range: Option<(u64, u64)>,
+    dif_range: Option<HashSet<(u64, u64)>>,
 }
 
 impl LayeredRegister {
@@ -67,11 +70,20 @@ impl LayeredRegister {
             self.layers.pop().unwrap()
         }
     }
-    pub fn set_dif_range(&mut self, start: u64, end: u64) {
-        self.dif_range = Some((start, end));
+    pub fn add_dif_range(&mut self, start: u64, end: u64) {
+        match self.dif_range {
+            None => {
+                let mut set = HashSet::new();
+                set.insert((start, end));
+                self.dif_range = Some(set);
+
+            }
+            Some(ref mut val) => {val.insert((start,end));}
+        }
+
     }
-    pub fn get_dif_range(&self) -> Option<(u64, u64)> {
-        self.dif_range
+    pub fn get_dif_range(&self) -> Option<HashSet<(u64, u64)>> {
+        self.dif_range.clone()
     }
     /*pub fn apply_to_layers1(self, mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Register, Option<(u64, u64)>) -> Register>, builder:&mut OpBuilder) -> Self
     {

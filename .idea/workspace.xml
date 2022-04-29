@@ -35,9 +35,8 @@
   <component name="ChangeListManager">
     <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/searcher/data_preparer.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/data_preparer.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/searcher/oracle.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/oracle.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/searcher/searcher.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/searcher.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/searcher/utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/utils.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/sha256/sha256_oracle.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/sha256/sha256_oracle.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -129,6 +128,11 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Cargo.Test" />
       <item itemvalue="Cargo.Run qaccelerator" />
@@ -164,7 +168,8 @@
       <workItem from="1649222376298" duration="545000" />
       <workItem from="1649297860906" duration="13787000" />
       <workItem from="1649410733872" duration="2000" />
-      <workItem from="1649729260092" duration="1970000" />
+      <workItem from="1649729260092" duration="3880000" />
+      <workItem from="1651202299472" duration="602000" />
     </task>
     <task id="LOCAL-00002" summary="Completed. Verification is required. Writing tests is required.">
       <created>1649521231648</created>
@@ -173,7 +178,21 @@
       <option name="project" value="LOCAL" />
       <updated>1649521231648</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Completed. Clean up is required Verification is required. Writing tests is required.">
+      <created>1649731288072</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1649731288072</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Completed. Clean up is required Verification is required. Writing tests is required.">
+      <created>1649731433678</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1649731433678</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -194,7 +213,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="make_prediction undone" />
     <MESSAGE value="Completed. Verification is required. Writing tests is required." />
-    <option name="LAST_COMMIT_MESSAGE" value="Completed. Verification is required. Writing tests is required." />
+    <MESSAGE value="Completed. Clean up is required Verification is required. Writing tests is required." />
+    <option name="LAST_COMMIT_MESSAGE" value="Completed. Clean up is required Verification is required. Writing tests is required." />
   </component>
   <component name="WindowStateProjectService">
     <state x="409" y="524" key="#Notifications" timestamp="1648000935722">
@@ -209,10 +229,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1647848756263" />
-    <state x="265" y="272" key="CommitChangelistDialog2" timestamp="1649521231168">
+    <state x="265" y="272" key="CommitChangelistDialog2" timestamp="1649731433212">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="265" y="272" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1649521231168" />
+    <state x="265" y="272" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1649731433212" />
     <state x="434" y="441" key="FileChooserDialogImpl" timestamp="1648001139294">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -241,14 +261,18 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="155" y="345" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1648001154309" />
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2" timestamp="1649521235279">
+    <state x="232" y="423" key="Vcs.Push.Dialog.v2" timestamp="1649731462894">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1649521235279" />
+    <state x="232" y="423" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1649731462894" />
     <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1648396787401">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1648396787401" />
+    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog" timestamp="1651202682226">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1651202682226" />
     <state x="317" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1648001097815">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
