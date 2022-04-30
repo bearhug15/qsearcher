@@ -45,7 +45,7 @@ impl Oracle for SHA256Oracle {
         }
     }
 
-    fn get_main_qubit_usage(&self) -> Option<usize> {
+    fn get_register_usage(&self) -> Option<usize> {
         Some(1)
     }
 

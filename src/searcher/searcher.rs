@@ -17,7 +17,7 @@ pub fn search(mut data: Vec<u8>,
               mut oracle: Box<dyn Oracle>,
               checker: Option<Box<dyn Checker>>,
               start_nonce_size: Option<u64>,
-              step: Option<u64>) -> Vec<u8> {
+              steps: Steps) -> Vec<u8> {
     match data_preparer {
         Some(prep) => {
             let prepared = prep.prepare(&data);
@@ -28,27 +28,25 @@ pub fn search(mut data: Vec<u8>,
         None => oracle.set_service_data(None)
     };
 
-    let main_qubit_usage = match oracle.get_main_qubit_usage() {
+    let main_qubit_usage = match oracle.get_register_usage() {
         Some(val) => val,
         None => {
             DEFAULT_MAIN_QUBIT_USAGE
         }
     };
-    let mut epoch = 0;
+    //let mut epoch = 0;
     let start_nonce_size = match start_nonce_size {
         None => { 1 }
         Some(val) => { val }
     };
-    let step = match step {
-        None => { 1 }
-        Some(val) => { val }
-    };
+
+    let mut nonce_size_bytes = start_nonce_size as u64;
     loop {
         let mut builder = OpBuilder::new();
-        let nonce_size_bits = (start_nonce_size + epoch * step) as u64;
-        let main_size_bits = (data.len() * 8) as u64 + nonce_size_bits;
-        let iterations_amount = (PI * (nonce_size_bits as f64).sqrt() as f64 /4.0).floor() as u64;
-        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bits, main_qubit_usage * iterations_amount as usize +1);
+        //let nonce_size_bits = (start_nonce_size + epoch * step) as u64;
+        let main_size_bits = (data.len() * 8) as u64 + nonce_size_bytes*8;
+        let iterations_amount = (PI * (nonce_size_bytes as f64 *8.0).sqrt() as f64 /4.0).floor() as u64;
+        let (mut main_qubits, mut initial_state) = oracle.init_main_data(&mut builder, &data, nonce_size_bytes, main_qubit_usage * iterations_amount as usize +1);
 
         let nonce_range = match main_qubits.get_dif_range() {
             None => { panic!("No diffusion range") }
@@ -87,8 +85,19 @@ pub fn search(mut data: Vec<u8>,
             }
             None => return result
         };
-        epoch = epoch + 1;
+        //epoch = epoch + 1;
+        match steps {
+            Steps::Default => {
+                nonce_size_bytes = nonce_size_bytes + 1;
+            }
+            Steps::Custom(step) => {
+                nonce_size_bytes = nonce_size_bytes + step as u64;
+            }
+            Steps::OneTime => {return result}
+        }
+
     }
+
 }
 
 fn diffuse(builder: &mut dyn UnitaryBuilder, mut qubits: Register) -> Register {
@@ -143,6 +152,11 @@ fn get_result(builder:&mut OpBuilder,main_qubits: LayeredRegister, init: Vec<Reg
     unimplemented!()
 }
 
+pub enum Steps{
+    Default,
+    Custom(u64),
+    OneTime
+}
 
 
 

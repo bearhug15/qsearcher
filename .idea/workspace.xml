@@ -35,7 +35,10 @@
   <component name="ChangeListManager">
     <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/searcher/oracle.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/oracle.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/searcher/searcher.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/searcher.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/searcher/utils.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/utils.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sha256/sha256_oracle.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/sha256/sha256_oracle.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,7 +170,7 @@
       <workItem from="1649297860906" duration="13787000" />
       <workItem from="1649410733872" duration="2000" />
       <workItem from="1649729260092" duration="3880000" />
-      <workItem from="1651202299472" duration="2397000" />
+      <workItem from="1651202299472" duration="15101000" />
     </task>
     <task id="LOCAL-00002" summary="Completed. Verification is required. Writing tests is required.">
       <created>1649521231648</created>
@@ -197,7 +200,14 @@
       <option name="project" value="LOCAL" />
       <updated>1651203117879</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="register_eq repaired">
+      <created>1651204968702</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1651204968702</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -220,7 +230,8 @@
     <MESSAGE value="Completed. Verification is required. Writing tests is required." />
     <MESSAGE value="Completed. Clean up is required Verification is required. Writing tests is required." />
     <MESSAGE value="Changed to several nonce ranges. Clean up is required Verification is required. Writing tests is required." />
-    <option name="LAST_COMMIT_MESSAGE" value="Changed to several nonce ranges. Clean up is required Verification is required. Writing tests is required." />
+    <MESSAGE value="register_eq repaired" />
+    <option name="LAST_COMMIT_MESSAGE" value="register_eq repaired" />
   </component>
   <component name="WindowStateProjectService">
     <state x="409" y="524" key="#Notifications" timestamp="1648000935722">
@@ -235,10 +246,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1647848756263" />
-    <state x="265" y="272" key="CommitChangelistDialog2" timestamp="1651203117341">
+    <state x="265" y="272" key="CommitChangelistDialog2" timestamp="1651204968207">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="265" y="272" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1651203117341" />
+    <state x="265" y="272" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1651204968207" />
     <state x="434" y="441" key="FileChooserDialogImpl" timestamp="1648001139294">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -247,38 +258,38 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="532" y="598" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1648000925626" />
-    <state width="1234" height="175" key="GridCell.Tab.0.bottom" timestamp="1651203059432">
+    <state width="1234" height="173" key="GridCell.Tab.0.bottom" timestamp="1651248315813">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1234" height="175" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1651203059432" />
-    <state width="1234" height="175" key="GridCell.Tab.0.center" timestamp="1651203059432">
+    <state width="1234" height="173" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1651248315813" />
+    <state width="1234" height="173" key="GridCell.Tab.0.center" timestamp="1651248315813">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1234" height="175" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1651203059432" />
-    <state width="1234" height="175" key="GridCell.Tab.0.left" timestamp="1651203059432">
+    <state width="1234" height="173" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1651248315813" />
+    <state width="1234" height="173" key="GridCell.Tab.0.left" timestamp="1651248315813">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1234" height="175" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1651203059432" />
-    <state width="1234" height="175" key="GridCell.Tab.0.right" timestamp="1651203059432">
+    <state width="1234" height="173" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1651248315813" />
+    <state width="1234" height="173" key="GridCell.Tab.0.right" timestamp="1651248315813">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1234" height="175" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1651203059432" />
+    <state width="1234" height="173" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1651248315813" />
     <state x="155" y="345" key="SettingsEditor" timestamp="1648001154309">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="155" y="345" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1648001154309" />
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2" timestamp="1651203121048">
+    <state x="232" y="423" key="Vcs.Push.Dialog.v2" timestamp="1651204970252">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1651203121048" />
+    <state x="232" y="423" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1651204970252" />
     <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1648396787401">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1648396787401" />
-    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog" timestamp="1651203014066">
+    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog" timestamp="1651248309305">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1651203014066" />
+    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1651248309305" />
     <state x="317" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1648001097815">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>

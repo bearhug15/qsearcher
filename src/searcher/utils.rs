@@ -85,19 +85,6 @@ impl LayeredRegister {
     pub fn get_dif_range(&self) -> Option<HashSet<(u64, u64)>> {
         self.dif_range.clone()
     }
-    /*pub fn apply_to_layers1(self, mut f: Box<dyn FnMut(&mut dyn UnitaryBuilder, Register, Option<(u64, u64)>) -> Register>, builder:&mut OpBuilder) -> Self
-    {
-        let  current_layer_index =self.current_layer_index;
-        let start_depth = self.start_depth;
-        let width = self.width;
-        let dif_range = self.dif_range;
-        let layers: Vec<Register> = self.layers.into_iter().map(|reg|{
-            f(builder,reg,dif_range)
-        }).collect();
-        LayeredRegister{layers,current_layer_index, start_depth,width, dif_range }
-        //unimplemented!()
-    }*/
-
     pub fn apply_to_layers1_in_range(mut self, mut f: Box<dyn Fn(&mut dyn UnitaryBuilder, Register) -> Register>, builder: &mut OpBuilder, start: u64, end: u64) -> Self {
         let current_layer_index = self.current_layer_index;
         let start_depth = self.start_depth;
