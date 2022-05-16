@@ -26,15 +26,20 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
     </configurations>
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="">
+    <list default="true" id="89c1342b-f531-48b6-aba3-4ee6d2f954d4" name="Default Changelist" comment="oracle in progress v1">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/searcher/searcher.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/searcher/searcher.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/sha256/words_provider.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/sha256/words_provider.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -73,35 +78,46 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="RunOnceActivity.cidr.known.project.marker" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="cf.first.check.clang-format" value="false" />
-    <property name="cidr.known.project.marker" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
-    <property name="settings.editor.selected.configurable" value="Errors" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\iarte\CLionProjects\qsearcher\src" />
       <recent name="C:\Users\iarte\CLionProjects\PAOCI\qaccelerator\src\searcher" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Run qaccelerator">
-    <configuration name="Run qaccelerator" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="run --package qaccelerator --bin qaccelerator" />
+  <component name="RunManager" selected="Cargo.build">
+    <configuration name="Generate UML" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <option name="channel" value="DEFAULT" />
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Run qaccelerator" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="run --package qsearcher --bin qsearcher" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
@@ -117,6 +133,23 @@
       <option name="requiredFeatures" value="true" />
       <option name="allFeatures" value="false" />
       <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="backtrace" value="SHORT" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="build" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="build --bin qsearcher" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="emulateTerminal" value="false" />
+      <option name="withSudo" value="false" />
       <option name="backtrace" value="SHORT" />
       <envs />
       <option name="isRedirectInput" value="false" />
@@ -126,6 +159,8 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Cargo.build" />
+      <item itemvalue="Cargo.Generate UML" />
       <item itemvalue="Cargo.Test" />
       <item itemvalue="Cargo.Run qaccelerator" />
     </list>
@@ -160,50 +195,6 @@
       <workItem from="1649222376298" duration="545000" />
       <workItem from="1649297860906" duration="13787000" />
       <workItem from="1649410733872" duration="2000" />
-      <workItem from="1649729260092" duration="3880000" />
-      <workItem from="1651202299472" duration="15719000" />
-    </task>
-    <task id="LOCAL-00002" summary="Completed. Verification is required. Writing tests is required.">
-      <created>1649521231648</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1649521231648</updated>
-    </task>
-    <task id="LOCAL-00003" summary="Completed. Clean up is required Verification is required. Writing tests is required.">
-      <created>1649731288072</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1649731288072</updated>
-    </task>
-    <task id="LOCAL-00004" summary="Completed. Clean up is required Verification is required. Writing tests is required.">
-      <created>1649731433678</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1649731433678</updated>
-    </task>
-    <task id="LOCAL-00005" summary="Changed to several nonce ranges. Clean up is required Verification is required. Writing tests is required.">
-      <created>1651203117879</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1651203117879</updated>
-    </task>
-    <task id="LOCAL-00006" summary="register_eq repaired">
-      <created>1651204968702</created>
-      <option name="number" value="00006" />
-      <option name="presentableId" value="LOCAL-00006" />
-      <option name="project" value="LOCAL" />
-      <updated>1651204968702</updated>
-    </task>
-    <task id="LOCAL-00007" summary="some fixes">
-      <created>1651322866695</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1651322866695</updated>
     </task>
     <option name="localTasksCounter" value="8" />
     <servers />
@@ -221,7 +212,6 @@
         </entry>
       </map>
     </option>
-    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="make_prediction undone" />
@@ -231,67 +221,5 @@
     <MESSAGE value="register_eq repaired" />
     <MESSAGE value="some fixes" />
     <option name="LAST_COMMIT_MESSAGE" value="some fixes" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="409" y="524" key="#Notifications" timestamp="1648000935722">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="409" y="524" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1648000935722" />
-    <state x="94" y="358" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1648914075587">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="94" y="358" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1648914075587" />
-    <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser" timestamp="1647848756263">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1085" y="416" key="#com.intellij.ide.util.MemberChooser/0.0.2560.1400@0.0.2560.1400" timestamp="1647848756263" />
-    <state x="265" y="272" key="CommitChangelistDialog2" timestamp="1651322866124">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="265" y="272" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1651322866124" />
-    <state x="434" y="441" key="FileChooserDialogImpl" timestamp="1648001139294">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="434" y="441" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1648001139294" />
-    <state x="532" y="598" key="Github.ShareDialog" timestamp="1648000925626">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="532" y="598" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1648000925626" />
-    <state width="1248" height="171" key="GridCell.Tab.0.bottom" timestamp="1651849177503">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="171" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1651849177503" />
-    <state width="1248" height="171" key="GridCell.Tab.0.center" timestamp="1651849177503">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="171" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1651849177503" />
-    <state width="1248" height="171" key="GridCell.Tab.0.left" timestamp="1651849177503">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="171" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1651849177503" />
-    <state width="1248" height="171" key="GridCell.Tab.0.right" timestamp="1651849177503">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state width="1248" height="171" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1651849177503" />
-    <state x="155" y="345" key="SettingsEditor" timestamp="1648001154309">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="155" y="345" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1648001154309" />
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2" timestamp="1651322868448">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="232" y="423" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1651322868448" />
-    <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1648396787401">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="471" y="614" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1648396787401" />
-    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog" timestamp="1651248309305">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="1696" y="488" key="refactoring.ChangeSignatureDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1651248309305" />
-    <state x="317" y="319" width="672" height="678" key="search.everywhere.popup" timestamp="1648001097815">
-      <screen x="0" y="0" width="2560" height="1400" />
-    </state>
-    <state x="317" y="319" width="672" height="678" key="search.everywhere.popup/0.0.2560.1400@0.0.2560.1400" timestamp="1648001097815" />
   </component>
 </project>

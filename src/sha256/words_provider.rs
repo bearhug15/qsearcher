@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-use itertools::Itertools;
 use qip::{OpBuilder, Register};
-use qip::pipeline::{RegisterInitialState, InitialState};
+use qip::pipeline::{RegisterInitialState};
 use qip::program;
-use crate::searcher::utils::{LayeredRegister, zeroed_register, swap_wrapper, register_rotr, register_shiftr, register_xor, register_sum};
+use crate::searcher::utils::{LayeredRegister, zeroed_register,swap_wrapper, register_rotr, register_shiftr, register_xor, register_sum};
 
 pub(crate) struct WordsProvider {
     //region->word_number->words
